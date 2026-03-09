@@ -1,8 +1,12 @@
-# Grocery Price Scraper
+🛒 Grocery Price Scraper
 
-This project scrapes grocery prices from major South African retailers and normalizes the data so that products can be compared across stores. The long-term goal is to allow users to build a shopping basket and see the cheapest store or store combination.
+This project scrapes grocery prices from major South African retailers and normalizes the data so that products can be compared across stores.
 
-Currently supported stores:
+The long-term goal is to allow users to build a shopping basket and determine the cheapest store (or combination of stores).
+
+Supported Stores
+
+Currently supported retailers:
 
 Checkers – Playwright scraper
 
@@ -10,7 +14,7 @@ Pick n Pay – Playwright scraper (works best with aisle URLs)
 
 Shoprite – HTML + hidden JSON extraction
 
-Makro – Playwright scraper (work in progress)
+Makro – Playwright scraper (Work in Progress)
 
 1. Setup
 Requirements
@@ -19,32 +23,29 @@ Node.js 18+
 
 npm
 
-Install dependencies
+Install Dependencies
 npm install
-Install Playwright browsers
+Install Playwright Browsers
 
 Required for the Checkers, Pick n Pay, and Makro scrapers.
 
 npx playwright install chromium
 2. Project Structure
-
-Key files in the project:
-
 scrapers/
-  checkersScraper.js     -> Checkers scraper
-  pnpScraper.js          -> Pick n Pay scraper
-  makroScraper.js        -> Makro scraper (WIP)
-  shopriteScraper.js     -> Shoprite scraper (axios + cheerio)
-  utils.js               -> price parsing utilities
-  masterScraper.js       -> runs all scrapers together
+  checkersScraper.js      # Checkers scraper
+  pnpScraper.js           # Pick n Pay scraper
+  makroScraper.js         # Makro scraper (WIP)
+  shopriteScraper.js      # Shoprite scraper (axios + cheerio)
+  utils.js                # Price parsing utilities
+  masterScraper.js        # Runs all scrapers together
 
 services/
-  browser.js             -> Playwright browser launcher (stealth enabled)
-  normalizeProducts.js   -> product normalization helpers
-  productMatcher.js      -> fuzzy product grouping
-  basketEngine.js        -> basket-level comparison logic
+  browser.js              # Playwright browser launcher (stealth enabled)
+  normalizeProducts.js    # Product normalization helpers
+  productMatcher.js       # Fuzzy product grouping
+  basketEngine.js         # Basket-level comparison logic
 
-testMatch.js             -> script to test cross-store product matching
+testMatch.js              # Script to test cross-store product matching
 3. Unified Data Format
 
 All scrapers return a standard product object:
@@ -59,9 +60,9 @@ This unified format allows all downstream systems to operate consistently.
 
 4. Product Normalization
 
-Products are normalized to make cross-store comparisons possible.
+Products are normalized to allow reliable cross-store comparison.
 
-normalizeProducts(products) adds:
+normalizeProducts(products) adds additional fields:
 
 {
   "store": "Checkers",
@@ -74,11 +75,21 @@ normalizeProducts(products) adds:
 
 Normalization includes:
 
-removing punctuation
+Removing punctuation
 
-lowercasing
+Converting to lowercase
 
-extracting size tokens (g, kg, ml, L, multipacks)
+Extracting size tokens:
+
+g
+
+kg
+
+ml
+
+L
+
+multipacks
 
 5. Cross-Store Product Matching
 
@@ -95,27 +106,29 @@ assignProductIds(products) produces:
 
 All stores selling the same item share the same product_id.
 
-Matching uses:
+Matching Logic
 
-normalized names
+Matching is based on:
 
-size tokens
+Normalized product names
 
-string similarity threshold (~0.9)
+Size tokens
+
+String similarity threshold (~0.9)
 
 6. Running Individual Scrapers
 
-From the project root:
+Run from the project root.
 
 Checkers
 node scrapers/checkersScraper.js "Albany Brown Bread 700g"
 Shoprite
 node scrapers/shopriteScraper.js "milk"
-Pick n Pay (search term)
+Pick n Pay (Search Term)
 node scrapers/pnpScraper.js "bread"
-Pick n Pay (aisle URL)
+Pick n Pay (Aisle URL)
 node scrapers/pnpScraper.js "https://www.pnp.co.za/c/fresh-milk-and-cream44805192"
-Makro (work in progress)
+Makro (Work in Progress)
 node scrapers/makroScraper.js "milk"
 
 Each command prints structured JSON output.
@@ -150,16 +163,13 @@ const results = await runAllScrapers('Albany Brown Bread 700g');
 
 The basket engine compares prices across stores for multiple items.
 
-Run from CLI:
-
+CLI Usage
 node services/basketEngine.js "milk" "bread" "eggs"
 
 or
 
 node services/basketEngine.js "milk,bread,eggs"
-
-Example output:
-
+Example Output
 [
   {
     "item": "milk",
@@ -180,20 +190,30 @@ Free-text search often returns no results.
 
 Works more reliably with aisle URLs.
 
-TODO:
+TODO
 
-improve selectors
+Improve selectors
 
-reverse engineer product tile structure
+Reverse engineer product tile structure
 
 Makro
 
-Heavy dynamic loading and bot protection.
+Makro pages use heavy dynamic loading and bot protection, making scraping unstable.
 
-Current Playwright approach is fragile.
+TODO
 
-TODO:
+Inspect network requests
 
-inspect network requests
+Attempt JSON/API extraction instead of DOM scraping
 
-attempt JSON/API extraction instead of DOM scraping
+Future Goals
+
+Add more retailers (Woolworths, Spar, Boxer)
+
+Improve fuzzy matching accuracy
+
+Store historical price data
+
+Build a basket optimization engine
+
+Develop a web UI for price comparison
